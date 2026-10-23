@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""get <number>: download a TechHub challenge's files into challenges/<number>/.
+
+A Git challenge arrives as a zip of a whole repository, history included (the hidden .git folder), so it is unzipped
+in place, ready for git log, git diff and the rest. Run it again with --fresh to start a challenge over."""
+import os, shutil, sys, urllib.request, zipfile
+
+SITE = os.environ.get('TECHHUB_FILES', 'https://techhub.byuaccounting.net/files/pilot')  # override only for testing
+FILES = {  # challenge number -> files on TechHub
+    381: ['ridgeline-trial-balance.zip'], 382: ['ridgeline-allocation.zip'], 391: ['ridgeline-pos-config.zip'],
+    392: ['ridgeline-fixed-assets.zip'], 393: ['ridgeline-accruals.zip'], 394: ['ridgeline-freight.zip'],
+    395: ['ridgeline-bank-sync.zip'], 396: ['ridgeline-close-checklist.zip'], 406: ['ridgeline-prepaids.zip'],
+    407: ['ridgeline-prepaids-handoff.zip'],
+}
+
+args = [a for a in sys.argv[1:] if a != '--fresh']
+if len(args) != 1 or not args[0].isdigit() or int(args[0]) not in FILES:
+    sys.exit('Usage: get <challenge number>, for example: get 381\nChallenges with files: '
+             + ', '.join(map(str, sorted(FILES))))
+n = int(args[0])
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+dest = os.path.join(root, 'challenges', str(n))
+if os.path.exists(dest):
+    if '--fresh' not in sys.argv:
+        sys.exit(f'challenges/{n} is already here (your work is in it). To start over: get {n} --fresh')
+    shutil.rmtree(dest)
+os.makedirs(dest)
+folders = set()
+for name in FILES[n]:
+    path = os.path.join(dest, name)
+    print(f'Downloading {name} ...')
+    req = urllib.request.Request(f'{SITE}/{n}/{name}', headers={'User-Agent': 'TechHub-workbench/1.0'})  # the server refuses Python's default
+    with urllib.request.urlopen(req, timeout=60) as r, open(path, 'wb') as out:
+        shutil.copyfileobj(r, out)
+    if name.endswith('.zip'):
+        with zipfile.ZipFile(path) as z:
+            z.extractall(dest)
+            folders |= {m.split('/')[0] for m in z.namelist() if '/' in m}
+        os.remove(path)
+for f in sorted(folders):
+    print(f'\nReady. Now run:\n  cd challenges/{n}/{f}')

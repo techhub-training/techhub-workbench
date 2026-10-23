@@ -1,0 +1,7 @@
+# keys and passwords: never commit these
+.env
+.streamlit/secrets.toml
+# challenge downloads: each is its own Git repository (get <number> puts them here)
+challenges/
+__pycache__/
+*.pyc
