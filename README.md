@@ -1,6 +1,6 @@
 # TechHub workbench
 
-One codespace for the TechHub Git and API challenges: Git, the GitHub CLI, Python with `requests`, and Claude Code,
+One codespace for the TechHub Git, API and MCP challenges: Git, the GitHub CLI, Python with `requests`, and Claude Code,
 all installed. Nothing to install on your computer.
 
 ## Set it up once
@@ -40,3 +40,17 @@ works out the answer, and writes a file. The sandbox keeps the data (Storage); y
    **Download**.
 
 Commit your scripts as you go. Your work is your own repository's history.
+
+## Using the Ridgeline MCP server with Claude Code (415)
+
+The same sandbox data is also offered as tools an AI agent can call, through an MCP server on TechHub. Connect Claude
+Code to it once, with a sandbox key (challenge 415 asks for a new one, so its holds stay separate from your other work):
+
+```
+claude mcp add --transport http ridgeline https://techhub.byuaccounting.net/mcp/ --header "X-API-Key: thk_..."
+claude mcp list
+```
+
+`claude mcp list` should show `ridgeline ... Connected`. Keep the slash at the end of the address. The key is saved in
+Claude Code's own settings on this codespace, not in any file in your repository. Then start `claude` and type `/mcp`
+to see its tools. To use a different key later: `claude mcp remove ridgeline`, then add it again.
