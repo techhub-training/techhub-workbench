@@ -41,6 +41,15 @@ works out the answer, and writes a file. The sandbox keeps the data (Storage); y
 
 Commit your scripts as you go. Your work is your own repository's history.
 
+## Calling Claude from a script (416)
+
+The same pattern as the sandbox API, with a different server: a POST to `https://api.anthropic.com/v1/messages` with
+your key in the `x-api-key` header and a JSON body, and a JSON reply.
+
+1. Create a key in your Anthropic account (console.anthropic.com > API Keys). Set a monthly spending limit first.
+2. Add it to `.env` as `ANTHROPIC_API_KEY=sk-ant-...` (see `.env.example`). Never in a script, never in a commit.
+3. `python scripts/hello_claude.py` makes one call and prints the answer and the tokens it used.
+
 ## Using the Ridgeline MCP server with Claude Code (415)
 
 The same sandbox data is also offered as tools an AI agent can call, through an MCP server on TechHub. Connect Claude
